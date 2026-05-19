@@ -12,7 +12,7 @@ import {
   type ContactFormValues,
 } from "@/features/contact/schemas/contact.schema";
 
-const learnerTypes = ["Student", "Professional", "Institution", "Donor"];
+const learnerTypes = ["Student", "Professional", "Regulator", "Entrepreneur"];
 
 export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);

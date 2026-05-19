@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Inter, Noto_Serif } from "next/font/google";
 import { Footer } from "@/shared/components/layout/Footer";
 import { Navbar } from "@/shared/components/layout/Navbar";
 import { siteConfig } from "@/shared/constants/site";
@@ -12,10 +12,11 @@ const bodyFont = Inter({
   display: "swap",
 });
 
-const headingFont = Space_Grotesk({
+const headingFont = Noto_Serif({
   subsets: ["latin"],
   variable: "--font-heading",
   display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {

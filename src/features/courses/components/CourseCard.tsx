@@ -55,7 +55,7 @@ export function CourseCard({ course }: CourseCardProps) {
 
       <div className="mt-auto grid grid-cols-2 gap-3 pt-6">
         <ButtonLink href="/courses" className="px-4">
-          Details
+          View Details
         </ButtonLink>
         <ButtonLink href="/contact" variant="outline" className="px-4">
           Enroll
