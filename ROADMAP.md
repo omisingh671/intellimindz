@@ -20,10 +20,11 @@ Status: Completed
 
 ## Phase 2 - Content and Page Depth
 
-Status: Planned
+Status: In Progress
 
 - Expand About Us with foundation story, mission, learner outcomes, and trust markers.
 - Improve Courses and Categories with filters, detail-ready card structure, and stronger content hierarchy.
+- Add a reusable `/categories/[slug]` detail-page system with category-specific hero content, tabs, courses, applications, learning path, careers, overview, and blog preview sections.
 - Add donation content depth while keeping payment integration pending.
 - Add SEO metadata for each public page.
 - Add lightweight accessibility and responsive QA pass.
@@ -61,4 +62,5 @@ Status: Future
 - Reference screenshots are available under `public/resources`.
 - Feature-based project foundation is in place under `src/features` and `src/shared`.
 - Homepage, shared layout, route shells, frontend-only forms, API/query setup, auth placeholders, and persisted mock auth state are implemented.
+- Category cards now link into a reusable dynamic category detail template powered by local static category detail data.
 - `pnpm lint` and `pnpm build` pass.

@@ -12,6 +12,10 @@ import { cn } from "@/shared/lib/utils";
 
 type LevelFilter = "All" | CourseLevel;
 type PriceFilter = "All" | "Free" | "Paid";
+type CourseDiscoverySectionProps = {
+  initialCategory?: string;
+  initialLevel?: CourseLevel;
+};
 
 const allCategoriesLabel = "All Categories";
 const levels: LevelFilter[] = [
@@ -24,11 +28,24 @@ const levels: LevelFilter[] = [
 ];
 const priceFilters: PriceFilter[] = ["All", "Free", "Paid"];
 
-export function CourseDiscoverySection() {
+export function CourseDiscoverySection({
+  initialCategory,
+  initialLevel,
+}: CourseDiscoverySectionProps = {}) {
+  const decodedInitialCategory = initialCategory
+    ? decodeURIComponent(initialCategory)
+    : undefined;
   const [search, setSearch] = useState("");
   const [latestOnly, setLatestOnly] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(allCategoriesLabel);
-  const [selectedLevel, setSelectedLevel] = useState<LevelFilter>("All");
+  const [selectedCategory, setSelectedCategory] = useState(
+    decodedInitialCategory &&
+      categories.some((category) => category.title === decodedInitialCategory)
+      ? decodedInitialCategory
+      : allCategoriesLabel,
+  );
+  const [selectedLevel, setSelectedLevel] = useState<LevelFilter>(
+    initialLevel ?? "All",
+  );
   const [selectedPrice, setSelectedPrice] = useState<PriceFilter>("All");
 
   const filteredCourses = useMemo(() => {
@@ -67,12 +84,12 @@ export function CourseDiscoverySection() {
         />
 
         <div className="mt-12 rounded-[2rem] border border-slate-200 bg-slate-50 p-5 shadow-sm sm:p-6">
-          <div className="grid gap-5 lg:grid-cols-[270px_1fr]">
-            <aside className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="grid gap-5 lg:grid-cols-[270px_1fr] lg:items-start">
+            <aside className="h-fit rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
               <button
                 type="button"
                 className={cn(
-                  "flex min-h-12 w-full items-center gap-2 rounded-2xl border px-4 text-left text-sm font-bold transition",
+                  "flex min-h-11 w-full items-center gap-2 rounded-2xl border px-3 text-left text-xs font-bold transition",
                   latestOnly
                     ? "border-blue-200 bg-blue-50 text-blue-700"
                     : "border-slate-200 text-slate-950 hover:bg-slate-50",
@@ -88,6 +105,7 @@ export function CourseDiscoverySection() {
                   <FilterTitle>Categories</FilterTitle>
                   <div className="mt-3 grid gap-1">
                     <CategoryButton
+                      key="all-categories"
                       label={allCategoriesLabel}
                       active={selectedCategory === allCategoriesLabel}
                       onClick={() => setSelectedCategory(allCategoriesLabel)}
@@ -97,7 +115,7 @@ export function CourseDiscoverySection() {
 
                       return (
                         <CategoryButton
-                          key={category.id}
+                          key={category.slug}
                           label={category.title}
                           active={selectedCategory === category.title}
                           onClick={() => setSelectedCategory(category.title)}
@@ -188,7 +206,7 @@ type FilterTitleProps = {
 
 function FilterTitle({ children }: FilterTitleProps) {
   return (
-    <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+    <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500">
       {children}
     </h3>
   );
@@ -206,13 +224,17 @@ function CategoryButton({ label, active, icon, onClick }: CategoryButtonProps) {
     <button
       type="button"
       className={cn(
-        "flex min-h-10 w-full items-center gap-2 rounded-2xl px-4 text-left text-sm font-semibold transition",
-        active ? "bg-blue-50 text-blue-700" : "text-slate-700 hover:bg-slate-50",
+        "flex min-h-9 w-full items-start gap-2 rounded-2xl px-3 py-2 text-left text-[11px] font-semibold leading-5 transition",
+        active
+          ? "bg-blue-50 text-blue-700"
+          : "bg-slate-50/70 text-slate-700 hover:bg-blue-50/70 hover:text-blue-700",
       )}
       onClick={onClick}
     >
-      {icon ? <span className="text-blue-600">{icon}</span> : null}
-      {label}
+      {icon ? (
+        <span className="mt-0.5 shrink-0 text-blue-600">{icon}</span>
+      ) : null}
+      <span>{label}</span>
     </button>
   );
 }
@@ -228,10 +250,10 @@ function PillButton({ active, children, onClick }: PillButtonProps) {
     <button
       type="button"
       className={cn(
-        "min-h-8 rounded-full border px-4 text-xs font-semibold transition",
+        "min-h-8 rounded-full border px-3 text-[10.5px] font-semibold transition",
         active
           ? "border-blue-500 bg-blue-50 text-blue-700"
-          : "border-slate-200 bg-white text-slate-700 hover:border-blue-300",
+          : "border-slate-200 bg-slate-50/70 text-slate-700 hover:border-blue-300 hover:bg-blue-50/70 hover:text-blue-700",
       )}
       onClick={onClick}
     >

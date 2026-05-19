@@ -12,7 +12,7 @@ export function HeroSection() {
             <Icons.sparkles className="size-4 text-amber-500" />
             FinTech learning for the next economy
           </div>
-          <h1 className="mt-7 max-w-3xl text-4xl font-bold tracking-normal text-slate-950 sm:text-5xl lg:text-6xl">
+          <h1 className="mt-7 max-w-3xl text-4xl font-bold leading-[1.18] tracking-normal text-slate-950 sm:text-5xl lg:text-6xl">
             Future-ready learning for the digital finance economy
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-8 text-slate-700 sm:text-lg">

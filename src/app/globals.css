@@ -36,6 +36,7 @@ h5,
 h6,
 .font-heading {
   font-family: var(--font-heading), Arial, Helvetica, sans-serif;
+  line-height: 1.18;
 }
 
 .font-body {

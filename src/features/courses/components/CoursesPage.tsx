@@ -1,9 +1,22 @@
 import { CourseDiscoverySection } from "@/features/courses/components/CourseDiscoverySection";
+import type { CourseLevel } from "@/features/courses/types/course.types";
 
-export function CoursesPage() {
+type CoursesPageProps = {
+  initialCategory?: string;
+  initialLevel?: CourseLevel;
+};
+
+export function CoursesPage({
+  initialCategory,
+  initialLevel,
+}: CoursesPageProps) {
   return (
     <main>
-      <CourseDiscoverySection />
+      <CourseDiscoverySection
+        key={`${initialCategory ?? "all"}-${initialLevel ?? "all"}`}
+        initialCategory={initialCategory}
+        initialLevel={initialLevel}
+      />
     </main>
   );
 }

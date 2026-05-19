@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Noto_Serif } from "next/font/google";
+import { Inter, Sora } from "next/font/google";
 import { Footer } from "@/shared/components/layout/Footer";
 import { Navbar } from "@/shared/components/layout/Navbar";
 import { siteConfig } from "@/shared/constants/site";
@@ -12,11 +12,11 @@ const bodyFont = Inter({
   display: "swap",
 });
 
-const headingFont = Noto_Serif({
+const headingFont = Sora({
   subsets: ["latin"],
   variable: "--font-heading",
   display: "swap",
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -25,6 +25,26 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  icons: {
+    icon: [
+      {
+        url: "/images/favicon.png",
+        type: "image/png",
+      },
+    ],
+    shortcut: [
+      {
+        url: "/images/favicon.png",
+        type: "image/png",
+      },
+    ],
+    apple: [
+      {
+        url: "/images/favicon.png",
+        type: "image/png",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

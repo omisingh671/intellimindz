@@ -1,11 +1,17 @@
 import type { LinkItem } from "@/shared/types/common.types";
+import type { Icons } from "@/shared/icons/icon-registry";
 
-export const primaryNavItems: LinkItem[] = [
-  { label: "About Us", href: "/about" },
-  { label: "Courses", href: "/courses" },
-  { label: "Categories", href: "/categories" },
-  { label: "Contact Us", href: "/contact" },
-  { label: "Donate", href: "/donate" },
+type PrimaryNavItem = LinkItem & {
+  icon: keyof typeof Icons;
+};
+
+export const primaryNavItems: PrimaryNavItem[] = [
+  { label: "Home", href: "/", icon: "home" },
+  { label: "About Us", href: "/about", icon: "info" },
+  { label: "Courses", href: "/courses", icon: "bookOpen" },
+  { label: "Categories", href: "/categories", icon: "layers" },
+  { label: "Contact Us", href: "/contact", icon: "message" },
+  { label: "Donate", href: "/donate", icon: "handCoins" },
 ];
 
 export const footerLinks = {
