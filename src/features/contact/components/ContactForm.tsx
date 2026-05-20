@@ -8,11 +8,10 @@ import { FormError } from "@/shared/components/ui/FormError";
 import { Input } from "@/shared/components/ui/Input";
 import { Textarea } from "@/shared/components/ui/Textarea";
 import {
+  contactLearnerTypeOptions,
   contactSchema,
   type ContactFormValues,
 } from "@/features/contact/schemas/contact.schema";
-
-const learnerTypes = ["Student", "Professional", "Regulator", "Entrepreneur"];
 
 export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -27,7 +26,6 @@ export function ContactForm() {
       name: "",
       email: "",
       phone: "",
-      learnerType: "",
       message: "",
     },
   });
@@ -62,9 +60,9 @@ export function ContactForm() {
             {...register("learnerType")}
           >
             <option value="">Learner type</option>
-            {learnerTypes.map((type) => (
+            {contactLearnerTypeOptions.map((type) => (
               <option key={type} value={type}>
-                {type}
+                {formatLearnerType(type)}
               </option>
             ))}
           </select>
@@ -96,4 +94,8 @@ type FieldProps = {
 
 function Field({ children }: FieldProps) {
   return <div>{children}</div>;
+}
+
+function formatLearnerType(type: ContactFormValues["learnerType"]) {
+  return type.charAt(0).toUpperCase() + type.slice(1);
 }

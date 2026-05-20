@@ -1,16 +1,19 @@
 export type AuthRole = "learner" | "admin" | "partner";
+export type LearnerType = "student" | "professional" | "regulator";
 
 export type AuthUser = {
   id: string;
   name: string;
   email: string;
+  mobile?: string;
+  city?: string;
+  learnerType?: LearnerType;
   role: AuthRole;
 };
 
 export type AuthSession = {
   user: AuthUser;
   accessToken: string;
-  refreshToken?: string;
 };
 
 export type LoginPayload = {
@@ -21,7 +24,15 @@ export type LoginPayload = {
 export type SignupPayload = {
   name: string;
   email: string;
+  mobile?: string;
+  city: string;
+  learnerType: LearnerType;
   password: string;
 };
 
-export type SsoProvider = "google" | "linkedin" | "microsoft" | "enterprise";
+export type SsoProvider =
+  | "google"
+  | "linkedin"
+  | "github"
+  | "microsoft"
+  | "enterprise";

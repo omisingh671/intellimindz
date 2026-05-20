@@ -1,18 +1,21 @@
 "use client";
 
 import { Button } from "@/shared/components/ui/Button";
+import { useSsoMutation } from "@/features/auth/hooks";
 import { Icons } from "@/shared/icons/icon-registry";
-import { startSso } from "@/features/auth/services/auth.api";
 
 export function EnterpriseLoginButton() {
+  const ssoMutation = useSsoMutation();
+
   return (
     <Button
       variant="secondary"
       className="w-full"
-      onClick={() => void startSso("enterprise")}
+      disabled={ssoMutation.isPending}
+      onClick={() => ssoMutation.mutate("enterprise")}
     >
       <Icons.building className="size-4" />
-      Continue with enterprise SSO
+      {ssoMutation.isPending ? "Connecting..." : "Continue with enterprise SSO"}
     </Button>
   );
 }

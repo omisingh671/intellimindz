@@ -2,13 +2,23 @@ import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/shared/lib/utils";
 
-type ButtonVariant = "primary" | "secondary" | "outline" | "ghost";
+type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "accent"
+  | "dark"
+  | "outline"
+  | "ghost";
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
     "bg-blue-600 text-white shadow-sm shadow-blue-600/20 hover:bg-blue-700",
   secondary:
     "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200 hover:bg-emerald-100",
+  accent:
+    "bg-yellow-400 text-[#0d183d] shadow-sm shadow-yellow-400/25 hover:bg-yellow-300 focus-visible:ring-yellow-400",
+  dark:
+    "bg-[#0d183d] text-white shadow-sm shadow-[#0d183d]/20 hover:bg-[#15265c] focus-visible:ring-[#0d183d]",
   outline:
     "border border-slate-300 bg-white text-slate-950 hover:border-blue-300 hover:bg-blue-50",
   ghost: "text-slate-700 hover:bg-slate-100 hover:text-slate-950",

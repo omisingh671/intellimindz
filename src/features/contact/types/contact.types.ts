@@ -1,1 +1,1 @@
-export type LearnerType = "Student" | "Professional" | "Institution" | "Donor";
+export type LearnerType = "student" | "professional" | "regulator";

@@ -1,8 +1,8 @@
 import type { LinkItem } from "@/shared/types/common.types";
-import type { Icons } from "@/shared/icons/icon-registry";
+import type { IconName } from "@/shared/icons/icon-registry";
 
 type PrimaryNavItem = LinkItem & {
-  icon: keyof typeof Icons;
+  icon: IconName;
 };
 
 export const primaryNavItems: PrimaryNavItem[] = [
