@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { AuthBootstrap } from "@/features/auth/components/AuthBootstrap";
 import { ReactQueryProvider } from "@/shared/providers/ReactQueryProvider";
+import { ToastProvider } from "@/shared/providers/ToastProvider";
 
 type AppProvidersProps = {
   children: ReactNode;
@@ -11,7 +12,9 @@ type AppProvidersProps = {
 export function AppProviders({ children }: AppProvidersProps) {
   return (
     <ReactQueryProvider>
-      <AuthBootstrap>{children}</AuthBootstrap>
+      <ToastProvider>
+        <AuthBootstrap>{children}</AuthBootstrap>
+      </ToastProvider>
     </ReactQueryProvider>
   );
 }

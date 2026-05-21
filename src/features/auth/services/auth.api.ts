@@ -176,7 +176,7 @@ function createMockSession(
       name,
       email,
       ...profile,
-      role: "learner",
+      role: "LEARNER",
     },
     accessToken: `${id}-access-token`,
   };

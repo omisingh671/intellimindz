@@ -1,0 +1,225 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  MANAGER
+  LEARNER
+}
+
+enum LearnerType {
+  STUDENT
+  PROFESSIONAL
+  REGULATOR
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CLOSED
+}
+
+enum DonationInterestStatus {
+  NEW
+  CONTACTED
+  CLOSED
+}
+
+enum CoursePriceType {
+  FREE
+  PAID
+  CONTACT
+}
+
+enum TaxMode {
+  GST_EXCLUSIVE
+  GST_INCLUSIVE
+  GST_EXEMPT
+}
+
+enum CouponDiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+model User {
+  id              String           @id @default(uuid())
+  name            String
+  email           String           @unique
+  passwordHash    String
+  mobile          String?
+  city            String?
+  learnerType     LearnerType?
+  role            UserRole         @default(LEARNER)
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  sessions        Session[]
+  assignedLeads   Lead[]           @relation("AssignedLeads")
+
+  @@index([role])
+  @@index([learnerType])
+}
+
+model Session {
+  id               String    @id @default(uuid())
+  userId           String
+  refreshTokenHash String    @unique
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime  @default(now())
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  title       String
+  description String   @db.Text
+  courseCount Int      @default(0)
+  icon        String
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  courses     Course[]
+}
+
+model CourseLevel {
+  id        String   @id @default(uuid())
+  label     String   @unique
+  step      Int      @unique
+  duration  String
+  outcome   String
+  idealFor  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  courses   Course[]
+}
+
+model Course {
+  id          String      @id @default(uuid())
+  slug        String      @unique
+  title       String
+  categoryId  String
+  levelId     String
+  duration    String
+  mode        String
+  audience    String
+  feeLabel    String
+  tags        Json
+  isLatest    Boolean     @default(false)
+  isPublished Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  category    Category    @relation(fields: [categoryId], references: [id])
+  level       CourseLevel @relation(fields: [levelId], references: [id])
+  prices      CoursePrice[]
+  coupons     CouponCourse[]
+
+  @@index([categoryId])
+  @@index([levelId])
+  @@index([isPublished])
+}
+
+model CoursePrice {
+  id              String          @id @default(uuid())
+  courseId        String
+  priceType       CoursePriceType @default(FREE)
+  currency        String          @default("INR")
+  baseAmountMinor Int?
+  taxMode         TaxMode         @default(GST_EXCLUSIVE)
+  gstRateBps      Int?
+  isActive        Boolean         @default(true)
+  validFrom       DateTime?
+  validUntil      DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  course          Course          @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([courseId])
+  @@index([isActive])
+  @@index([validFrom, validUntil])
+}
+
+model Coupon {
+  id                 String             @id @default(uuid())
+  code               String             @unique
+  name               String
+  description        String?            @db.Text
+  discountType       CouponDiscountType
+  discountValueBps   Int?
+  discountAmountMinor Int?
+  currency           String             @default("INR")
+  minimumAmountMinor Int?
+  maxRedemptions     Int?
+  redeemedCount      Int                @default(0)
+  validFrom          DateTime?
+  validUntil         DateTime?
+  isActive           Boolean            @default(true)
+  appliesToAllCourses Boolean           @default(false)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  courses            CouponCourse[]
+
+  @@index([isActive])
+  @@index([validFrom, validUntil])
+}
+
+model CouponCourse {
+  couponId  String
+  courseId  String
+  createdAt DateTime @default(now())
+  coupon    Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@id([couponId, courseId])
+  @@index([courseId])
+}
+
+model Lead {
+  id           String     @id @default(uuid())
+  name         String
+  email        String
+  mobile       String?
+  learnerType  LearnerType?
+  courseId     String?
+  message      String     @db.Text
+  source       String     @default("website")
+  status       LeadStatus @default(NEW)
+  assignedToId String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  assignedTo   User?      @relation("AssignedLeads", fields: [assignedToId], references: [id])
+
+  @@index([status])
+  @@index([assignedToId])
+  @@index([learnerType])
+  @@index([courseId])
+}
+
+model DonationInterest {
+  id              String                 @id @default(uuid())
+  amountMinor     Int
+  currency        String                 @default("INR")
+  firstName       String
+  lastName        String
+  email           String
+  status          DonationInterestStatus @default(NEW)
+  source          String                 @default("donation-form")
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  @@index([email])
+  @@index([status])
+}

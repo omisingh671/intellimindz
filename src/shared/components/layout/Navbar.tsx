@@ -378,6 +378,14 @@ function DesktopUserMenu({
             </p>
           </div>
         </div>
+        {user.role !== "LEARNER" ? (
+          <UserMenuLink
+            href="/admin"
+            icon="shieldCheck"
+            label="Admin Dashboard"
+            onClick={() => setIsOpen(false)}
+          />
+        ) : null}
         <UserMenuLink
           href="/account"
           icon="user"
@@ -431,6 +439,14 @@ function MobileUserMenu({
         </div>
       </div>
       <div className="grid gap-1 pt-2">
+        {user.role !== "LEARNER" ? (
+          <UserMenuLink
+            href="/admin"
+            icon="shieldCheck"
+            label="Admin Dashboard"
+            onClick={onNavigate}
+          />
+        ) : null}
         <UserMenuLink
           href="/account"
           icon="user"

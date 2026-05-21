@@ -2,29 +2,49 @@
 
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Button } from "@/shared/components/ui/Button";
 import { FormError } from "@/shared/components/ui/FormError";
 import { Input } from "@/shared/components/ui/Input";
 import { loginSchema, type LoginFormValues } from "@/features/auth/schemas/login.schema";
-import { getAuthErrorMessage, useLoginMutation } from "@/features/auth/hooks";
+import { getPostAuthRedirectPath, useLoginMutation } from "@/features/auth/hooks";
+import { useAppSubmit } from "@/shared/hooks/useAppSubmit";
+
+const devLoginDefaultValues: LoginFormValues =
+  process.env.NODE_ENV === "development" &&
+  process.env.NEXT_PUBLIC_DEV_LOGIN_AUTOFILL === "true"
+    ? {
+        email: "student@intellimindz.local",
+        password: "Password@123",
+      }
+    : {
+        email: "",
+        password: "",
+      };
 
 export function LoginForm() {
+  const router = useRouter();
   const loginMutation = useLoginMutation();
+  const submit = useAppSubmit();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: devLoginDefaultValues,
   });
 
   function onSubmit(values: LoginFormValues) {
-    loginMutation.mutate(values);
+    void submit.runSubmit({
+      action: () => loginMutation.mutateAsync(values),
+      errorMessage: "Unable to login right now.",
+      successMessage: "You're signed in for this session.",
+      onSuccess: (session) => {
+        router.replace(getPostAuthRedirectPath(session.user));
+      },
+    });
   }
 
   return (
@@ -73,21 +93,18 @@ export function LoginForm() {
         type="submit"
         variant="accent"
         className="w-full shadow-yellow-400/30"
-        disabled={loginMutation.isPending}
+        disabled={submit.isSubmitting}
       >
-        {loginMutation.isPending ? "Signing in..." : "Login"}
+        {submit.isSubmitting ? "Signing in..." : "Login"}
       </Button>
-      {loginMutation.isError ? (
+      {submit.errorMessage ? (
         <p className="text-center text-sm font-medium text-red-600">
-          {getAuthErrorMessage(
-            loginMutation.error,
-            "Unable to login right now.",
-          )}
+          {submit.errorMessage}
         </p>
       ) : null}
-      {loginMutation.isSuccess ? (
+      {submit.successMessage ? (
         <p className="text-center text-sm font-medium text-emerald-700">
-          You&apos;re signed in for this session.
+          {submit.successMessage}
         </p>
       ) : null}
     </form>

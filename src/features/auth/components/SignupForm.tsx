@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Button } from "@/shared/components/ui/Button";
 import { FormError } from "@/shared/components/ui/FormError";
@@ -11,10 +12,13 @@ import {
   signupSchema,
   type SignupFormValues,
 } from "@/features/auth/schemas/signup.schema";
-import { getAuthErrorMessage, useSignupMutation } from "@/features/auth/hooks";
+import { useSignupMutation } from "@/features/auth/hooks";
+import { useAppSubmit } from "@/shared/hooks/useAppSubmit";
 
 export function SignupForm() {
+  const router = useRouter();
   const signupMutation = useSignupMutation();
+  const submit = useAppSubmit();
   const {
     register,
     handleSubmit,
@@ -33,13 +37,21 @@ export function SignupForm() {
   });
 
   function onSubmit(values: SignupFormValues) {
-    signupMutation.mutate({
-      city: values.city,
-      email: values.email,
-      learnerType: values.learnerType,
-      mobile: values.mobile || undefined,
-      name: values.name,
-      password: values.password,
+    void submit.runSubmit({
+      action: () =>
+        signupMutation.mutateAsync({
+          city: values.city,
+          email: values.email,
+          learnerType: values.learnerType,
+          mobile: values.mobile || undefined,
+          name: values.name,
+          password: values.password,
+        }),
+      errorMessage: "Unable to create account right now.",
+      successMessage: `Your ${formatLearnerType(values.learnerType)} learner profile is ready for this session.`,
+      onSuccess: () => {
+        router.replace("/account");
+      },
     });
   }
 
@@ -175,21 +187,18 @@ export function SignupForm() {
         type="submit"
         variant="accent"
         className="w-full shadow-yellow-400/30"
-        disabled={signupMutation.isPending}
+        disabled={submit.isSubmitting}
       >
-        {signupMutation.isPending ? "Creating account..." : "Create Account"}
+        {submit.isSubmitting ? "Creating account..." : "Create Account"}
       </Button>
-      {signupMutation.isError ? (
+      {submit.errorMessage ? (
         <p className="text-center text-sm font-medium text-red-600">
-          {getAuthErrorMessage(
-            signupMutation.error,
-            "Unable to create account right now.",
-          )}
+          {submit.errorMessage}
         </p>
       ) : null}
-      {signupMutation.isSuccess ? (
+      {submit.successMessage ? (
         <p className="text-center text-sm font-medium text-emerald-700">
-          Your learner profile is ready for this session.
+          {submit.successMessage}
         </p>
       ) : null}
     </form>

@@ -1,24 +1,29 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/shared/components/ui/Button";
 import { FormError } from "@/shared/components/ui/FormError";
 import { Input } from "@/shared/components/ui/Input";
 import { Textarea } from "@/shared/components/ui/Textarea";
+import { useAppSubmit } from "@/shared/hooks/useAppSubmit";
 import {
   contactLearnerTypeOptions,
   contactSchema,
   type ContactFormValues,
 } from "@/features/contact/schemas/contact.schema";
+import { submitContactEnquiry } from "@/features/contact/services/contact.api";
 
-export function ContactForm() {
-  const [submitted, setSubmitted] = useState(false);
+type ContactFormProps = {
+  courseId?: string;
+};
+
+export function ContactForm({ courseId }: ContactFormProps) {
+  const submit = useAppSubmit();
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     reset,
   } = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
@@ -30,9 +35,19 @@ export function ContactForm() {
     },
   });
 
-  function onSubmit() {
-    setSubmitted(true);
-    reset();
+  function onSubmit(values: ContactFormValues) {
+    const successMessage = courseId
+      ? "Thanks. Your course enquiry has been submitted."
+      : "Thanks. Your enquiry has been submitted.";
+
+    void submit.runSubmit({
+      action: () => submitContactEnquiry(values, courseId),
+      errorMessage: "Unable to submit enquiry right now.",
+      successMessage,
+      onSuccess: () => {
+        reset();
+      },
+    });
   }
 
   return (
@@ -76,12 +91,17 @@ export function ContactForm() {
         />
         <FormError message={errors.message?.message} />
       </div>
-      <Button type="submit" className="mt-5 w-full" disabled={isSubmitting}>
-        Submit Enquiry
+      <Button type="submit" className="mt-5 w-full" disabled={submit.isSubmitting}>
+        {submit.isSubmitting ? "Submitting..." : "Submit Enquiry"}
       </Button>
-      {submitted ? (
+      {submit.errorMessage ? (
+        <p className="mt-4 text-center text-sm font-medium text-red-600">
+          {submit.errorMessage}
+        </p>
+      ) : null}
+      {submit.successMessage ? (
         <p className="mt-4 text-center text-sm font-medium text-emerald-700">
-          Thanks. Your enquiry is captured locally for now.
+          {submit.successMessage}
         </p>
       ) : null}
     </form>

@@ -7,4 +7,8 @@ export const API_ENDPOINTS = {
     me: "/auth/me",
     ssoStart: (provider: string) => `/auth/sso/${provider}/start`,
   },
+  forms: {
+    lead: "/leads",
+    donationInterest: "/donation-interest",
+  },
 } as const;

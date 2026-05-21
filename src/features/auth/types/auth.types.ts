@@ -1,4 +1,4 @@
-export type AuthRole = "learner" | "admin" | "partner";
+export type AuthRole = "SUPER_ADMIN" | "ADMIN" | "MANAGER" | "LEARNER";
 export type LearnerType = "student" | "professional" | "regulator";
 
 export type AuthUser = {

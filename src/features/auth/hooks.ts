@@ -15,6 +15,7 @@ import type {
   LoginPayload,
   SignupPayload,
   SsoProvider,
+  AuthUser,
 } from "@/features/auth/types/auth.types";
 
 export function useLoginMutation() {
@@ -63,14 +64,18 @@ export function useLogoutMutation() {
   });
 }
 
-export function useGuestRedirect(redirectTo = "/") {
+export function getPostAuthRedirectPath(user: Pick<AuthUser, "role">) {
+  return user.role === "LEARNER" ? "/account" : "/admin";
+}
+
+export function useGuestRedirect(redirectTo?: string) {
   const router = useRouter();
   const status = useAuthStore((state) => state.status);
   const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
     if (status === "authenticated" && user) {
-      router.replace(redirectTo);
+      router.replace(redirectTo ?? getPostAuthRedirectPath(user));
     }
   }, [redirectTo, router, status, user]);
 }

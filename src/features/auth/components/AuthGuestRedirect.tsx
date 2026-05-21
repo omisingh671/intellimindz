@@ -3,7 +3,7 @@
 import { useGuestRedirect } from "@/features/auth/hooks";
 
 export function AuthGuestRedirect() {
-  useGuestRedirect("/");
+  useGuestRedirect();
 
   return null;
 }

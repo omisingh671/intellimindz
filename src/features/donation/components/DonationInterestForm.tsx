@@ -1,26 +1,27 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { donationAmounts } from "@/features/donation/data/donation.data";
 import {
   donationInterestSchema,
   type DonationInterestValues,
 } from "@/features/donation/schemas/donation.schema";
+import { submitDonationInterest } from "@/features/donation/services/donation.api";
 import { Button } from "@/shared/components/ui/Button";
 import { FormError } from "@/shared/components/ui/FormError";
 import { Input } from "@/shared/components/ui/Input";
+import { useAppSubmit } from "@/shared/hooks/useAppSubmit";
 import { cn } from "@/shared/lib/utils";
 
 export function DonationInterestForm() {
-  const [submitted, setSubmitted] = useState(false);
+  const submit = useAppSubmit();
   const {
     register,
     control,
     handleSubmit,
     setValue,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     reset,
   } = useForm<DonationInterestValues>({
     resolver: zodResolver(donationInterestSchema),
@@ -33,9 +34,15 @@ export function DonationInterestForm() {
   });
   const selectedAmount = useWatch({ control, name: "amount" });
 
-  function onSubmit() {
-    setSubmitted(true);
-    reset({ amount: "20000", firstName: "", lastName: "", email: "" });
+  function onSubmit(values: DonationInterestValues) {
+    void submit.runSubmit({
+      action: () => submitDonationInterest(values),
+      errorMessage: "Unable to capture sponsorship interest right now.",
+      successMessage: "Sponsorship interest submitted. Our team will contact you.",
+      onSuccess: () => {
+        reset({ amount: "20000", firstName: "", lastName: "", email: "" });
+      },
+    });
   }
 
   return (
@@ -82,15 +89,20 @@ export function DonationInterestForm() {
         <Input type="email" placeholder="Email Address" {...register("email")} />
         <FormError message={errors.email?.message} />
       </div>
-      <Button type="submit" className="mt-6 w-full" disabled={isSubmitting}>
-        Be a Part of the Change
+      <Button type="submit" className="mt-6 w-full" disabled={submit.isSubmitting}>
+        {submit.isSubmitting ? "Submitting..." : "Be a Part of the Change"}
       </Button>
       <p className="mt-4 text-center text-xs text-slate-500">
         Donations are interest-only for now. Payment gateway integration is pending.
       </p>
-      {submitted ? (
+      {submit.errorMessage ? (
+        <p className="mt-3 text-center text-sm font-medium text-red-600">
+          {submit.errorMessage}
+        </p>
+      ) : null}
+      {submit.successMessage ? (
         <p className="mt-3 text-center text-sm font-medium text-emerald-700">
-          Sponsorship interest captured locally for this phase.
+          {submit.successMessage}
         </p>
       ) : null}
     </form>

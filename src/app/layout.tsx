@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
 import { Inter, Sora } from "next/font/google";
-import { Suspense } from "react";
-import { Footer } from "@/shared/components/layout/Footer";
-import { Navbar } from "@/shared/components/layout/Navbar";
 import { siteConfig } from "@/shared/constants/site";
 import { AppProviders } from "@/shared/providers/AppProviders";
 import "./globals.css";
@@ -56,13 +53,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${bodyFont.variable} ${headingFont.variable}`}>
       <body>
-        <AppProviders>
-          <Suspense fallback={<div className="min-h-20 border-b border-slate-200/80 bg-white" />}>
-            <Navbar />
-          </Suspense>
-          {children}
-          <Footer />
-        </AppProviders>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );
