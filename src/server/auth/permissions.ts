@@ -1,4 +1,5 @@
 import type { UserRole } from "@/generated/prisma";
+import { AUTH_ROLES } from "@/shared/constants/auth-roles";
 
 export type Permission =
   | "admin:access"
@@ -10,7 +11,7 @@ export type Permission =
   | "settings:manage";
 
 const rolePermissions: Record<UserRole, Permission[]> = {
-  SUPER_ADMIN: [
+  [AUTH_ROLES.superAdmin]: [
     "admin:access",
     "users:manage",
     "learners:manage",
@@ -19,7 +20,7 @@ const rolePermissions: Record<UserRole, Permission[]> = {
     "leads:manage",
     "settings:manage",
   ],
-  ADMIN: [
+  [AUTH_ROLES.admin]: [
     "admin:access",
     "users:manage",
     "learners:manage",
@@ -28,8 +29,8 @@ const rolePermissions: Record<UserRole, Permission[]> = {
     "leads:manage",
     "settings:manage",
   ],
-  MANAGER: ["admin:access", "leads:manage"],
-  LEARNER: [],
+  [AUTH_ROLES.manager]: ["admin:access", "leads:manage"],
+  [AUTH_ROLES.learner]: [],
 };
 
 export function hasPermission(role: UserRole, permission: Permission) {
@@ -43,12 +44,14 @@ export function assertPermission(role: UserRole, permission: Permission) {
 }
 
 export function canCreateRole(actorRole: UserRole, targetRole: UserRole) {
-  if (actorRole === "SUPER_ADMIN") {
+  if (actorRole === AUTH_ROLES.superAdmin) {
     return true;
   }
 
-  if (actorRole === "ADMIN") {
-    return targetRole === "MANAGER" || targetRole === "LEARNER";
+  if (actorRole === AUTH_ROLES.admin) {
+    return (
+      targetRole === AUTH_ROLES.manager || targetRole === AUTH_ROLES.learner
+    );
   }
 
   return false;

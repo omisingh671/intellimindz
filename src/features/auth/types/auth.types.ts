@@ -1,4 +1,4 @@
-export type AuthRole = "SUPER_ADMIN" | "ADMIN" | "MANAGER" | "LEARNER";
+export type { AuthRole } from "@/shared/constants/auth-roles";
 export type LearnerType = "student" | "professional" | "regulator";
 
 export type LoginPayload = {

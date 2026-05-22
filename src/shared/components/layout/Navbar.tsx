@@ -8,6 +8,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { siteConfig } from "@/shared/constants/site";
+import { AUTH_ROLES } from "@/shared/constants/auth-roles";
 import { Icons } from "@/shared/icons/icon-registry";
 import { cn } from "@/shared/lib/utils";
 
@@ -381,7 +382,7 @@ function DesktopUserMenu({
             </p>
           </div>
         </div>
-        {user.role !== "LEARNER" ? (
+        {user.role !== AUTH_ROLES.learner ? (
           <UserMenuLink
             href="/admin/dashboard"
             icon="shieldCheck"
@@ -443,7 +444,7 @@ function MobileUserMenu({
         </div>
       </div>
       <div className="grid gap-1 pt-2">
-        {user.role !== "LEARNER" ? (
+        {user.role !== AUTH_ROLES.learner ? (
           <UserMenuLink
             href="/admin/dashboard"
             icon="shieldCheck"

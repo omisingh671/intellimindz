@@ -11,6 +11,7 @@ import {
   signup,
   startSso,
 } from "@/features/auth/services/auth.api";
+import { AUTH_ROLES } from "@/shared/constants/auth-roles";
 import type {
   LoginPayload,
   SignupPayload,
@@ -49,7 +50,7 @@ export function useLogoutMutation() {
 }
 
 export function getPostAuthRedirectPath(user: Pick<Session["user"], "role">) {
-  return user.role === "LEARNER" ? "/" : "/admin/dashboard";
+  return user.role === AUTH_ROLES.learner ? "/" : "/admin/dashboard";
 }
 
 export function useGuestRedirect(redirectTo?: string) {

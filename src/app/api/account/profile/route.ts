@@ -48,8 +48,24 @@ export async function PATCH(request: NextRequest) {
       return fail("Check your profile details and try again.", 422);
     }
 
-    if (currentUser.role === UserRole.LEARNER && !parsed.data.learnerType) {
+    if (
+      currentUser.role === UserRole.LEARNER &&
+      !currentUser.learnerType &&
+      !parsed.data.learnerType
+    ) {
       return fail("Select your learner type.", 422);
+    }
+
+    const currentLearnerType = currentUser.learnerType?.toLowerCase();
+
+    if (
+      currentUser.role === UserRole.LEARNER &&
+      currentUser.profileCompleted &&
+      currentLearnerType &&
+      parsed.data.learnerType &&
+      parsed.data.learnerType !== currentLearnerType
+    ) {
+      return fail("Learner type can only be changed by an admin.", 403);
     }
 
     const profileImage = readImageField(formData, "profileImage");
@@ -70,7 +86,9 @@ export async function PATCH(request: NextRequest) {
           (parsed.data.removeProfileImage ? null : currentUser.imageStorageKey),
         learnerType:
           currentUser.role === UserRole.LEARNER
-            ? learnerTypeMap[parsed.data.learnerType!]
+            ? parsed.data.learnerType
+              ? learnerTypeMap[parsed.data.learnerType]
+              : currentUser.learnerType
             : currentUser.learnerType,
         mobile: parsed.data.mobile || null,
         name: parsed.data.name,
