@@ -1,7 +1,7 @@
 "use client";
 
+import { SessionProvider } from "next-auth/react";
 import type { ReactNode } from "react";
-import { AuthBootstrap } from "@/features/auth/components/AuthBootstrap";
 import { ReactQueryProvider } from "@/shared/providers/ReactQueryProvider";
 import { ToastProvider } from "@/shared/providers/ToastProvider";
 
@@ -11,10 +11,10 @@ type AppProvidersProps = {
 
 export function AppProviders({ children }: AppProvidersProps) {
   return (
-    <ReactQueryProvider>
-      <ToastProvider>
-        <AuthBootstrap>{children}</AuthBootstrap>
-      </ToastProvider>
-    </ReactQueryProvider>
+    <SessionProvider>
+      <ReactQueryProvider>
+        <ToastProvider>{children}</ToastProvider>
+      </ReactQueryProvider>
+    </SessionProvider>
   );
 }

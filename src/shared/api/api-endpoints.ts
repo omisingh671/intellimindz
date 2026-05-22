@@ -1,7 +1,9 @@
 export const API_ENDPOINTS = {
+  account: {
+    profile: "/account/profile",
+  },
   auth: {
     signup: "/auth/register",
-    me: "/auth/me",
   },
   forms: {
     lead: "/leads",

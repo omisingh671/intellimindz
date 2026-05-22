@@ -44,3 +44,9 @@ next-env.d.ts
 
 # generated prisma client
 src/generated/prisma/
+
+# local media uploads
+/public/uploads/
+
+# Google OAuth downloaded credentials
+client_secret_*.apps.googleusercontent.com.json

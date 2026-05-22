@@ -11,6 +11,8 @@ export type SessionUser = {
   emailVerified?: Date | null;
   id: string;
   image?: string | null;
+  imageProvider?: string | null;
+  imageStorageKey?: string | null;
   isActive: boolean;
   learnerType: LearnerType | null;
   mobile: string | null;
@@ -86,6 +88,8 @@ function normalizeSessionUser(user: User): SessionUser {
     emailVerified: user.emailVerified,
     id: user.id,
     image: user.image,
+    imageProvider: user.imageProvider,
+    imageStorageKey: user.imageStorageKey,
     isActive: user.isActive,
     learnerType: user.learnerType,
     mobile: user.mobile,

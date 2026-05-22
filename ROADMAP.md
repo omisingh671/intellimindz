@@ -12,7 +12,7 @@ Status: Completed
 
 - Create the feature-based structure under `src/features` and reusable platform layer under `src/shared`.
 - Keep `src/app` focused on routing, metadata, layout composition, and global styles.
-- Add shared layout components, constants, icon registry, UI primitives, API client setup, React Query provider, and frontend-safe auth store.
+- Add shared layout components, constants, icon registry, UI primitives, API client setup, React Query provider, and Auth.js session provider wiring.
 - Build a polished responsive homepage inspired by the screenshots in `public/resources`.
 - Add simple route shells for About Us, Courses, Categories, Contact, Donate, Login, and SignUp.
 - Add validated frontend-only forms for Contact, Login, and SignUp.
@@ -43,6 +43,7 @@ Status: In Progress
 - Enforce permissions in API Route Handlers, not only in dashboard navigation.
 - Add a reusable `useAppSubmit` form-submit pattern while keeping feature forms in control of business rules.
 - Add reusable toast feedback for common form submit success and error states.
+- Add self-service account profile editing with reusable local media storage for profile pictures.
 - Connect public contact/course enquiry submissions to the backend `Lead` table with server-side validation.
 - Connect donation interest submissions to backend persistence while keeping payment gateway integration deferred.
 - Add a unified placeholder `Payment` ledger for donation and future course payments, including full, EMI, and flexible payment modes.
@@ -80,9 +81,10 @@ Status: Future
 - Basic Next.js scaffold exists.
 - Reference screenshots are available under `public/resources`.
 - Feature-based project foundation is in place under `src/features` and `src/shared`.
-- Homepage, shared layout, route shells, frontend forms, API/query setup, and persisted auth state are implemented.
+- Homepage, shared layout, route shells, frontend forms, API/query setup, and Auth.js-backed client auth state are implemented.
 - Category cards now link into a reusable dynamic category detail template powered by local static category detail data.
 - Public routes are grouped under a public layout so guest-facing pages keep the existing Navbar/Footer and visual design.
 - Admin routes are grouped under a separate protected dashboard layout at `/admin`.
 - Prisma schema and seed setup are added for the full-stack MVP.
+- Signed-in users can update profile details and an optional profile picture from `/account`.
 - `pnpm lint` and `pnpm build` pass.

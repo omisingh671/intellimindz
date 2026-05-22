@@ -12,6 +12,9 @@ const serverEnvSchema = z
     AUTH_LINKEDIN_SECRET: z.string().optional(),
     AUTH_SECRET: z.string().min(32).optional(),
     DATABASE_URL: z.string().min(1, "DATABASE_URL is required."),
+    STORAGE_LOCAL_ROOT: z.string().trim().min(1).default("public/uploads"),
+    STORAGE_PROVIDER: z.enum(["local"]).default("local"),
+    STORAGE_PUBLIC_BASE_URL: z.string().trim().min(1).default("/uploads"),
     NODE_ENV: z
       .enum(["development", "production", "test"])
       .default("development"),
@@ -92,5 +95,15 @@ export function getAuthProviderEnv() {
       clientId: env.AUTH_LINKEDIN_ID,
       clientSecret: env.AUTH_LINKEDIN_SECRET,
     },
+  };
+}
+
+export function getStorageEnv() {
+  const env = getServerEnv();
+
+  return {
+    localRoot: env.STORAGE_LOCAL_ROOT,
+    provider: env.STORAGE_PROVIDER,
+    publicBaseUrl: env.STORAGE_PUBLIC_BASE_URL,
   };
 }
