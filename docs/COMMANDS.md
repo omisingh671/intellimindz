@@ -13,6 +13,7 @@ Copy `.env.example` to `.env` locally and update:
 
 DATABASE_URL="mysql://root:password@localhost:3306/intellimindz"
 AUTH_SECRET="replace-with-a-long-random-auth-secret"
+NEXTAUTH_URL="http://localhost:3000"
 AUTH_GOOGLE_ID=""
 AUTH_GOOGLE_SECRET=""
 AUTH_GITHUB_ID=""
@@ -20,8 +21,10 @@ AUTH_GITHUB_SECRET=""
 AUTH_LINKEDIN_ID=""
 AUTH_LINKEDIN_SECRET=""
 NEXT_PUBLIC_API_URL="/api"
-NEXT_PUBLIC_AUTH_MOCK="false"
 NEXT_PUBLIC_DEV_LOGIN_AUTOFILL="false"
+STORAGE_PROVIDER="local"
+STORAGE_LOCAL_ROOT="public/uploads"
+STORAGE_PUBLIC_BASE_URL="/uploads"
 
 For local-only login autofill during development, set:
 

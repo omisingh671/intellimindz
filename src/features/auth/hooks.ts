@@ -1,5 +1,7 @@
 "use client";
 
+import type { Session } from "next-auth";
+import { useSession } from "next-auth/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -9,34 +11,22 @@ import {
   signup,
   startSso,
 } from "@/features/auth/services/auth.api";
-import { useAuthStore } from "@/stores/auth.store";
+import { AUTH_ROLES } from "@/shared/constants/auth-roles";
 import type {
-  AuthSession,
   LoginPayload,
   SignupPayload,
   SsoProvider,
-  AuthUser,
 } from "@/features/auth/types/auth.types";
 
 export function useLoginMutation() {
-  const setAuth = useAuthStore((state) => state.setAuth);
-
-  return useMutation<AuthSession, Error, LoginPayload>({
+  return useMutation<Session, Error, LoginPayload>({
     mutationFn: login,
-    onSuccess: (session) => {
-      setAuth(session);
-    },
   });
 }
 
 export function useSignupMutation() {
-  const setAuth = useAuthStore((state) => state.setAuth);
-
-  return useMutation<AuthSession, Error, SignupPayload>({
+  return useMutation<Session, Error, SignupPayload>({
     mutationFn: signup,
-    onSuccess: (session) => {
-      setAuth(session);
-    },
   });
 }
 
@@ -47,26 +37,26 @@ export function useSsoMutation() {
 }
 
 export function useLogoutMutation() {
-  const clearAuth = useAuthStore((state) => state.clearAuth);
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   return useMutation<void, Error, void>({
     mutationFn: logout,
     onSettled: () => {
-      clearAuth();
       queryClient.clear();
+      router.refresh();
     },
   });
 }
 
-export function getPostAuthRedirectPath(user: Pick<AuthUser, "role">) {
-  return user.role === "LEARNER" ? "/" : "/admin/dashboard";
+export function getPostAuthRedirectPath(user: Pick<Session["user"], "role">) {
+  return user.role === AUTH_ROLES.learner ? "/" : "/admin/dashboard";
 }
 
 export function useGuestRedirect(redirectTo?: string) {
   const router = useRouter();
-  const status = useAuthStore((state) => state.status);
-  const user = useAuthStore((state) => state.user);
+  const { data: session, status } = useSession();
+  const user = session?.user;
 
   useEffect(() => {
     if (status === "authenticated" && user) {
@@ -77,8 +67,8 @@ export function useGuestRedirect(redirectTo?: string) {
 
 export function useRequireAuth(redirectTo = "/login") {
   const router = useRouter();
-  const status = useAuthStore((state) => state.status);
-  const user = useAuthStore((state) => state.user);
+  const { data: session, status } = useSession();
+  const user = session?.user;
 
   useEffect(() => {
     if (status === "unauthenticated" || (status === "authenticated" && !user)) {

@@ -1,22 +1,5 @@
-export type AuthRole = "SUPER_ADMIN" | "ADMIN" | "MANAGER" | "LEARNER";
+export type { AuthRole } from "@/shared/constants/auth-roles";
 export type LearnerType = "student" | "professional" | "regulator";
-
-export type AuthUser = {
-  id: string;
-  name: string;
-  email: string;
-  image?: string;
-  isActive: boolean;
-  profileCompleted: boolean;
-  mobile?: string;
-  city?: string;
-  learnerType?: LearnerType;
-  role: AuthRole;
-};
-
-export type AuthSession = {
-  user: AuthUser;
-};
 
 export type LoginPayload = {
   email: string;

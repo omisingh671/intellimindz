@@ -9,6 +9,7 @@ import LinkedInProvider from "next-auth/providers/linkedin";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/server/db/prisma";
 import { getAuthProviderEnv, getAuthSecret } from "@/server/config/env";
+import { AUTH_ROLES } from "@/shared/constants/auth-roles";
 
 const providerEnv = getAuthProviderEnv();
 
@@ -82,7 +83,7 @@ export const authOptions: NextAuthOptions = {
           learnerType: null,
           mobile: null,
           profileCompleted: false,
-          role: "LEARNER",
+          role: AUTH_ROLES.learner,
         };
 
         return session;

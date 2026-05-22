@@ -76,6 +76,8 @@ model User {
   email           String           @unique
   emailVerified   DateTime?
   image           String?
+  imageProvider   String?
+  imageStorageKey String?
   passwordHash    String?
   mobile          String?
   city            String?

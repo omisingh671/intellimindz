@@ -1,11 +1,14 @@
 "use client";
 
+import type { Session } from "next-auth";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { siteConfig } from "@/shared/constants/site";
+import { AUTH_ROLES } from "@/shared/constants/auth-roles";
 import { Icons } from "@/shared/icons/icon-registry";
 import { cn } from "@/shared/lib/utils";
 
@@ -15,9 +18,7 @@ import { Container } from "@/shared/components/ui/Container";
 import { learningLevels } from "@/features/home/data/home.data";
 import { courses } from "@/features/courses/data/courses.data";
 import { useLogoutMutation } from "@/features/auth/hooks";
-import { useAuthStore } from "@/stores/auth.store";
 
-import type { AuthUser } from "@/features/auth/types/auth.types";
 import type { CourseLevel } from "@/features/courses/types/course.types";
 
 export function Navbar() {
@@ -27,8 +28,8 @@ export function Navbar() {
   const mobileToggleRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const user = useAuthStore((state) => state.user);
-  const status = useAuthStore((state) => state.status);
+  const { data: session, status } = useSession();
+  const user = status === "authenticated" ? session?.user : null;
   const logoutMutation = useLogoutMutation();
   const MenuIcon = isOpen ? Icons.x : Icons.menu;
   const latestCourses = courses.filter((course) => course.isLatest).slice(0, 6);
@@ -313,8 +314,10 @@ export function Navbar() {
 type UserMenuProps = {
   isLoggingOut: boolean;
   onLogout: () => void;
-  user: AuthUser;
+  user: NavSessionUser;
 };
+
+type NavSessionUser = Session["user"];
 
 type DesktopUserMenuProps = UserMenuProps & {
   isOpen: boolean;
@@ -330,7 +333,8 @@ function DesktopUserMenu({
   setIsOpen,
   user,
 }: DesktopUserMenuProps) {
-  const displayName = getCompactUserName(user.name);
+  const userLabel = getUserLabel(user);
+  const displayName = getCompactUserName(userLabel);
 
   return (
     <div
@@ -351,7 +355,7 @@ function DesktopUserMenu({
         <UserAvatar user={user} />
         <span
           className="max-w-36 truncate text-sm font-semibold text-slate-800"
-          title={user.name}
+          title={userLabel}
         >
           {displayName}
         </span>
@@ -370,15 +374,15 @@ function DesktopUserMenu({
         <div className="flex items-center gap-3 border-b border-slate-100 px-3 py-3">
           <UserAvatar user={user} />
           <div className="min-w-0">
-            <p className="truncate text-sm font-bold text-slate-950" title={user.name}>
+            <p className="truncate text-sm font-bold text-slate-950" title={userLabel}>
               {displayName}
             </p>
             <p className="truncate text-xs font-semibold text-slate-500">
-              {user.email}
+              {user.email ?? ""}
             </p>
           </div>
         </div>
-        {user.role !== "LEARNER" ? (
+        {user.role !== AUTH_ROLES.learner ? (
           <UserMenuLink
             href="/admin/dashboard"
             icon="shieldCheck"
@@ -423,23 +427,24 @@ function MobileUserMenu({
   onNavigate,
   user,
 }: MobileUserMenuProps) {
-  const displayName = getCompactUserName(user.name);
+  const userLabel = getUserLabel(user);
+  const displayName = getCompactUserName(userLabel);
 
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-3 shadow-sm shadow-slate-950/5">
       <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
         <UserAvatar user={user} />
         <div className="min-w-0">
-          <p className="truncate text-sm font-bold text-slate-950" title={user.name}>
+          <p className="truncate text-sm font-bold text-slate-950" title={userLabel}>
             {displayName}
           </p>
           <p className="truncate text-xs font-semibold text-slate-500">
-            {user.email}
+            {user.email ?? ""}
           </p>
         </div>
       </div>
       <div className="grid gap-1 pt-2">
-        {user.role !== "LEARNER" ? (
+        {user.role !== AUTH_ROLES.learner ? (
           <UserMenuLink
             href="/admin/dashboard"
             icon="shieldCheck"
@@ -496,14 +501,30 @@ function UserMenuLink({ href, icon, label, onClick }: UserMenuLinkProps) {
   );
 }
 
-function UserAvatar({ user }: { user: AuthUser }) {
-  const initial = user.name.trim().charAt(0).toUpperCase() || "U";
+function UserAvatar({ user }: { user: NavSessionUser }) {
+  const userLabel = getUserLabel(user);
+  const initial = getUserLabel(user).charAt(0).toUpperCase() || "U";
 
   return (
-    <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#0d183d] text-sm font-bold text-white shadow-sm shadow-slate-950/15">
-      {initial}
+    <span className="relative grid size-9 shrink-0 overflow-hidden rounded-full bg-[#0d183d] text-sm font-bold text-white shadow-sm shadow-slate-950/15">
+      {user.image ? (
+        <Image
+          src={user.image}
+          alt={`${userLabel} profile picture`}
+          fill
+          unoptimized
+          sizes="36px"
+          className="object-cover"
+        />
+      ) : (
+        <span className="m-auto">{initial}</span>
+      )}
     </span>
   );
+}
+
+function getUserLabel(user: NavSessionUser) {
+  return user.name?.trim() || user.email?.trim() || "Account";
 }
 
 function getCompactUserName(name: string, maxLength = 18) {
