@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 import { LearnerType } from "@/generated/prisma";
-import { createSession, setAuthCookies } from "@/server/auth/session";
+import { toAuthUser } from "@/server/auth/session";
 import { prisma } from "@/server/db/prisma";
 import { fail, ok } from "@/server/http/responses";
 
@@ -44,17 +44,9 @@ export async function POST(request: NextRequest) {
       mobile: parsed.data.mobile || null,
       name: parsed.data.name,
       passwordHash,
+      profileCompleted: true,
     },
   });
-  const session = await createSession(user);
-  const response = ok(
-    {
-      accessToken: session.accessToken,
-      user: session.user,
-    },
-    { status: 201 },
-  );
-  setAuthCookies(response, session);
 
-  return response;
+  return ok({ user: toAuthUser(user) }, { status: 201 });
 }

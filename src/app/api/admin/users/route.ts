@@ -67,6 +67,7 @@ export async function POST(request: NextRequest) {
         mobile: parsed.data.mobile || null,
         name: parsed.data.name,
         passwordHash,
+        profileCompleted: true,
         role: parsed.data.role,
       },
     });
