@@ -1,177 +1,96 @@
-import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
-import type { User, UserRole } from "@/generated/prisma";
-import { prisma } from "@/server/db/prisma";
-import {
-  accessCookieName,
-  createRefreshToken,
-  hashRefreshToken,
-  refreshCookieName,
-  refreshTokenMaxAgeSeconds,
-  signAccessToken,
-  verifyAccessToken,
-} from "@/server/auth/tokens";
+import { getServerSession } from "next-auth";
+import type { NextRequest } from "next/server";
+import type { LearnerType, User, UserRole } from "@/generated/prisma";
+import { authOptions } from "@/server/auth/config";
 import { assertPermission, type Permission } from "@/server/auth/permissions";
-import { getNodeEnv } from "@/server/config/env";
+import { prisma } from "@/server/db/prisma";
 
-export type SessionUser = Pick<
-  User,
-  "city" | "email" | "id" | "isActive" | "learnerType" | "mobile" | "name" | "role"
->;
+export type SessionUser = {
+  city: string | null;
+  email: string;
+  emailVerified?: Date | null;
+  id: string;
+  image?: string | null;
+  isActive: boolean;
+  learnerType: LearnerType | null;
+  mobile: string | null;
+  name: string;
+  profileCompleted: boolean;
+  role: UserRole;
+};
 
-export function toAuthUser(user: SessionUser) {
+export function toAuthUser(user: SessionUser | User) {
+  const name = user.name ?? user.email;
+
   return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    mobile: user.mobile ?? undefined,
     city: user.city ?? undefined,
-    learnerType: user.learnerType ? user.learnerType.toLowerCase() : undefined,
-    role: user.role,
-  };
-}
-
-export async function createSession(user: SessionUser) {
-  const accessToken = await signAccessToken({
     email: user.email,
-    name: user.name,
+    id: user.id,
+    image: "image" in user ? user.image ?? undefined : undefined,
+    isActive: user.isActive,
+    learnerType: user.learnerType ? user.learnerType.toLowerCase() : undefined,
+    mobile: user.mobile ?? undefined,
+    name,
+    profileCompleted: user.profileCompleted,
     role: user.role,
-    sub: user.id,
-  });
-  const refreshToken = createRefreshToken();
-  const expiresAt = new Date(Date.now() + refreshTokenMaxAgeSeconds * 1000);
-
-  await prisma.session.create({
-    data: {
-      expiresAt,
-      refreshTokenHash: hashRefreshToken(refreshToken),
-      userId: user.id,
-    },
-  });
-
-  return {
-    accessToken,
-    refreshToken,
-    user: toAuthUser(user),
   };
 }
 
-export function setAuthCookies(response: NextResponse, session: Awaited<ReturnType<typeof createSession>>) {
-  const isProduction = getNodeEnv() === "production";
-
-  response.cookies.set(refreshCookieName, session.refreshToken, {
-    httpOnly: true,
-    maxAge: refreshTokenMaxAgeSeconds,
-    path: "/",
-    sameSite: "lax",
-    secure: isProduction,
-  });
-  response.cookies.set(accessCookieName, session.accessToken, {
-    httpOnly: true,
-    maxAge: 15 * 60,
-    path: "/",
-    sameSite: "lax",
-    secure: isProduction,
-  });
+export async function getCurrentAuthSession() {
+  return getServerSession(authOptions);
 }
 
-export function clearAuthCookies(response: NextResponse) {
-  response.cookies.set(refreshCookieName, "", { maxAge: 0, path: "/" });
-  response.cookies.set(accessCookieName, "", { maxAge: 0, path: "/" });
-}
+export async function getCurrentUserFromRequest(request?: NextRequest) {
+  void request;
 
-export async function refreshFromCookie(refreshToken: string | undefined) {
-  if (!refreshToken) {
-    return null;
-  }
-
-  const storedSession = await prisma.session.findUnique({
-    where: { refreshTokenHash: hashRefreshToken(refreshToken) },
-    include: { user: true },
-  });
-
-  if (
-    !storedSession ||
-    storedSession.revokedAt ||
-    storedSession.expiresAt <= new Date() ||
-    !storedSession.user.isActive
-  ) {
-    return null;
-  }
-
-  await prisma.session.update({
-    where: { id: storedSession.id },
-    data: { revokedAt: new Date() },
-  });
-
-  return createSession(storedSession.user);
-}
-
-export async function revokeRefreshToken(refreshToken: string | undefined) {
-  if (!refreshToken) {
-    return;
-  }
-
-  await prisma.session.updateMany({
-    where: {
-      revokedAt: null,
-      refreshTokenHash: hashRefreshToken(refreshToken),
-    },
-    data: {
-      revokedAt: new Date(),
-    },
-  });
-}
-
-export async function getCurrentUserFromRequest(request: NextRequest) {
-  const headerToken = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-  const cookieToken = request.cookies.get(accessCookieName)?.value;
-  const token = headerToken || cookieToken;
-
-  if (!token) {
-    return null;
-  }
-
-  const payload = await verifyAccessToken(token);
-
-  return prisma.user.findFirst({
-    where: {
-      id: payload.sub,
-      isActive: true,
-    },
-  });
+  return getCurrentUserFromCookies();
 }
 
 export async function getCurrentUserFromCookies() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(accessCookieName)?.value;
+  const session = await getCurrentAuthSession();
+  const userId = session?.user?.id;
 
-  if (!token) {
+  if (!userId) {
     return null;
   }
 
-  try {
-    const payload = await verifyAccessToken(token);
+  const user = await prisma.user.findFirst({
+    where: {
+      id: userId,
+      isActive: true,
+    },
+  });
 
-    return prisma.user.findFirst({
-      where: {
-        id: payload.sub,
-        isActive: true,
-      },
-    });
-  } catch {
-    return null;
-  }
+  return user ? normalizeSessionUser(user) : null;
 }
 
-export async function requireApiPermission(request: NextRequest, permission: Permission) {
+export async function requireApiPermission(
+  request: NextRequest,
+  permission: Permission,
+) {
   const user = await getCurrentUserFromRequest(request);
 
   if (!user) {
     throw new Error("UNAUTHORIZED");
   }
 
-  assertPermission(user.role as UserRole, permission);
+  assertPermission(user.role, permission);
 
   return user;
+}
+
+function normalizeSessionUser(user: User): SessionUser {
+  return {
+    city: user.city,
+    email: user.email,
+    emailVerified: user.emailVerified,
+    id: user.id,
+    image: user.image,
+    isActive: user.isActive,
+    learnerType: user.learnerType,
+    mobile: user.mobile,
+    name: user.name ?? user.email,
+    profileCompleted: user.profileCompleted,
+    role: user.role,
+  };
 }

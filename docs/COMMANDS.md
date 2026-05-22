@@ -12,7 +12,13 @@ pnpm dlx package-name
 Copy `.env.example` to `.env` locally and update:
 
 DATABASE_URL="mysql://root:password@localhost:3306/intellimindz"
-JWT_ACCESS_SECRET="replace-with-a-long-random-secret"
+AUTH_SECRET="replace-with-a-long-random-auth-secret"
+AUTH_GOOGLE_ID=""
+AUTH_GOOGLE_SECRET=""
+AUTH_GITHUB_ID=""
+AUTH_GITHUB_SECRET=""
+AUTH_LINKEDIN_ID=""
+AUTH_LINKEDIN_SECRET=""
 NEXT_PUBLIC_API_URL="/api"
 NEXT_PUBLIC_AUTH_MOCK="false"
 NEXT_PUBLIC_DEV_LOGIN_AUTOFILL="false"

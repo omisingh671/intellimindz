@@ -41,13 +41,8 @@ export function useSignupMutation() {
 }
 
 export function useSsoMutation() {
-  const setAuth = useAuthStore((state) => state.setAuth);
-
-  return useMutation<AuthSession, Error, SsoProvider>({
+  return useMutation<void, Error, SsoProvider>({
     mutationFn: startSso,
-    onSuccess: (session) => {
-      setAuth(session);
-    },
   });
 }
 
@@ -65,7 +60,7 @@ export function useLogoutMutation() {
 }
 
 export function getPostAuthRedirectPath(user: Pick<AuthUser, "role">) {
-  return user.role === "LEARNER" ? "/account" : "/admin";
+  return user.role === "LEARNER" ? "/" : "/admin/dashboard";
 }
 
 export function useGuestRedirect(redirectTo?: string) {

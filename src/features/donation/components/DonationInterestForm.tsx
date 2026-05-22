@@ -1,13 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { donationAmounts } from "@/features/donation/data/donation.data";
 import {
   donationInterestSchema,
   type DonationInterestValues,
 } from "@/features/donation/schemas/donation.schema";
-import { submitDonationInterest } from "@/features/donation/services/donation.api";
+import { submitDonationPlaceholderPayment } from "@/features/donation/services/donation.api";
 import { Button } from "@/shared/components/ui/Button";
 import { FormError } from "@/shared/components/ui/FormError";
 import { Input } from "@/shared/components/ui/Input";
@@ -15,6 +16,7 @@ import { useAppSubmit } from "@/shared/hooks/useAppSubmit";
 import { cn } from "@/shared/lib/utils";
 
 export function DonationInterestForm() {
+  const router = useRouter();
   const submit = useAppSubmit();
   const {
     register,
@@ -36,11 +38,12 @@ export function DonationInterestForm() {
 
   function onSubmit(values: DonationInterestValues) {
     void submit.runSubmit({
-      action: () => submitDonationInterest(values),
-      errorMessage: "Unable to capture sponsorship interest right now.",
-      successMessage: "Sponsorship interest submitted. Our team will contact you.",
-      onSuccess: () => {
+      action: () => submitDonationPlaceholderPayment(values),
+      errorMessage: "Unable to create donation payment right now.",
+      successMessage: "Donation payment placeholder created.",
+      onSuccess: (result) => {
         reset({ amount: "20000", firstName: "", lastName: "", email: "" });
+        router.push(`/donate/payment/${result.payment.id}`);
       },
     });
   }
@@ -93,7 +96,7 @@ export function DonationInterestForm() {
         {submit.isSubmitting ? "Submitting..." : "Be a Part of the Change"}
       </Button>
       <p className="mt-4 text-center text-xs text-slate-500">
-        Donations are interest-only for now. Payment gateway integration is pending.
+        Donations are placeholder-only for now. Payment gateway integration is pending.
       </p>
       {submit.errorMessage ? (
         <p className="mt-3 text-center text-sm font-medium text-red-600">

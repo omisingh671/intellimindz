@@ -50,7 +50,7 @@ export function SignupForm() {
       errorMessage: "Unable to create account right now.",
       successMessage: `Your ${formatLearnerType(values.learnerType)} learner profile is ready for this session.`,
       onSuccess: () => {
-        router.replace("/account");
+        router.replace("/");
       },
     });
   }

@@ -5,7 +5,7 @@ import { hasPermission } from "@/server/auth/permissions";
 import type { SessionUser } from "@/server/auth/session";
 
 const adminNavItems = [
-  { href: "/admin", label: "Overview", icon: "home", permission: "admin:access" },
+  { href: "/admin/dashboard", label: "Overview", icon: "home", permission: "admin:access" },
   { href: "/admin/users", label: "Users", icon: "users", permission: "users:manage" },
   { href: "/admin/learners", label: "Learners", icon: "graduationCap", permission: "learners:manage" },
   { href: "/admin/courses", label: "Courses", icon: "bookOpen", permission: "courses:manage" },

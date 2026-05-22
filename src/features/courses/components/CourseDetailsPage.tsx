@@ -56,8 +56,8 @@ export function CourseDetailsPage({ course }: CourseDetailsPageProps) {
                 <SnapshotItem label="Mode" value={course.mode} />
                 <SnapshotItem label="Fee" value={course.fee} />
               </div>
-              <ButtonLink href="/contact" className="mt-6 w-full">
-                Enquire Now
+              <ButtonLink href={`/courses/${course.id}/payment`} className="mt-6 w-full">
+                Enroll Now
                 <Icons.arrowRight className="size-4" />
               </ButtonLink>
             </aside>

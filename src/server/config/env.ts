@@ -4,18 +4,24 @@ import { z } from "zod";
 
 const serverEnvSchema = z
   .object({
+    AUTH_GITHUB_ID: z.string().optional(),
+    AUTH_GITHUB_SECRET: z.string().optional(),
+    AUTH_GOOGLE_ID: z.string().optional(),
+    AUTH_GOOGLE_SECRET: z.string().optional(),
+    AUTH_LINKEDIN_ID: z.string().optional(),
+    AUTH_LINKEDIN_SECRET: z.string().optional(),
+    AUTH_SECRET: z.string().min(32).optional(),
     DATABASE_URL: z.string().min(1, "DATABASE_URL is required."),
-    JWT_ACCESS_SECRET: z.string().min(32).optional(),
     NODE_ENV: z
       .enum(["development", "production", "test"])
       .default("development"),
   })
   .superRefine((env, context) => {
-    if (env.NODE_ENV === "production" && !env.JWT_ACCESS_SECRET) {
+    if (env.NODE_ENV === "production" && !env.AUTH_SECRET) {
       context.addIssue({
         code: "custom",
-        message: "JWT_ACCESS_SECRET is required in production.",
-        path: ["JWT_ACCESS_SECRET"],
+        message: "AUTH_SECRET is required in production.",
+        path: ["AUTH_SECRET"],
       });
     }
   });
@@ -62,10 +68,29 @@ export function getDatabaseUrl() {
   return getServerEnv().DATABASE_URL;
 }
 
-export function getJwtAccessSecret() {
-  return getServerEnv().JWT_ACCESS_SECRET;
-}
-
 export function getNodeEnv() {
   return getServerEnv().NODE_ENV;
+}
+
+export function getAuthSecret() {
+  return getServerEnv().AUTH_SECRET;
+}
+
+export function getAuthProviderEnv() {
+  const env = getServerEnv();
+
+  return {
+    github: {
+      clientId: env.AUTH_GITHUB_ID,
+      clientSecret: env.AUTH_GITHUB_SECRET,
+    },
+    google: {
+      clientId: env.AUTH_GOOGLE_ID,
+      clientSecret: env.AUTH_GOOGLE_SECRET,
+    },
+    linkedin: {
+      clientId: env.AUTH_LINKEDIN_ID,
+      clientSecret: env.AUTH_LINKEDIN_SECRET,
+    },
+  };
 }

@@ -5,6 +5,9 @@ export type AuthUser = {
   id: string;
   name: string;
   email: string;
+  image?: string;
+  isActive: boolean;
+  profileCompleted: boolean;
   mobile?: string;
   city?: string;
   learnerType?: LearnerType;
@@ -13,7 +16,6 @@ export type AuthUser = {
 
 export type AuthSession = {
   user: AuthUser;
-  accessToken: string;
 };
 
 export type LoginPayload = {
@@ -33,6 +35,4 @@ export type SignupPayload = {
 export type SsoProvider =
   | "google"
   | "linkedin"
-  | "github"
-  | "microsoft"
-  | "enterprise";
+  | "github";

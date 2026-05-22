@@ -8,12 +8,10 @@ export type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 
 type SetAuthPayload = {
   user: AuthUser;
-  accessToken: string;
 };
 
 type AuthState = {
   user: AuthUser | null;
-  accessToken: string | null;
   status: AuthStatus;
   setAuth: (payload: SetAuthPayload) => void;
   setLoading: () => void;
@@ -26,12 +24,10 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
-      accessToken: null,
       status: "loading",
-      setAuth: ({ user, accessToken }) =>
+      setAuth: ({ user }) =>
         set({
           user,
-          accessToken,
           status: "authenticated",
         }),
       setLoading: () =>
@@ -41,26 +37,23 @@ export const useAuthStore = create<AuthState>()(
       clearAuth: () =>
         set({
           user: null,
-          accessToken: null,
           status: "unauthenticated",
         }),
       logout: () =>
         set({
           user: null,
-          accessToken: null,
           status: "unauthenticated",
         }),
       isAuthenticated: () => {
-        const { accessToken, status, user } = get();
+        const { status, user } = get();
 
-        return status === "authenticated" && Boolean(user && accessToken);
+        return status === "authenticated" && Boolean(user);
       },
     }),
     {
       name: "intellimindz-auth",
       partialize: (state) => ({
         user: state.user,
-        accessToken: state.accessToken,
         status: state.status,
       }),
     },

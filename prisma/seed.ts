@@ -97,6 +97,7 @@ async function main() {
           learnerType: "learnerType" in user ? user.learnerType : null,
           name: user.name,
           passwordHash,
+          profileCompleted: true,
           role: user.role,
         },
         create: {
@@ -106,6 +107,7 @@ async function main() {
           learnerType: "learnerType" in user ? user.learnerType : undefined,
           name: user.name,
           passwordHash,
+          profileCompleted: true,
           role: user.role,
         },
       }),

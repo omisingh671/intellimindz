@@ -4,7 +4,7 @@
 
 Intellimindz Foundation is a budget-friendly FinTech + EdTech website for financial literacy, structured learning programs, course discovery, enquiries, donations, and role-based operations.
 
-The public learner-facing release should stay fast, responsive, accessible, and visually stable. Backend and admin features now live inside the same Next.js App Router app through Route Handlers, Prisma, MySQL, and a protected `/admin` dashboard. CMS, payment gateway, real SSO, and AI integrations remain deferred until explicitly requested.
+The public learner-facing release should stay fast, responsive, accessible, and visually stable. Backend and admin features now live inside the same Next.js App Router app through Route Handlers, Prisma, MySQL, Auth.js, and a protected `/admin` dashboard. CMS, real payment gateway integration, and AI integrations remain deferred until explicitly requested.
 
 ## Phase 1 - Project Foundation and Homepage
 
@@ -33,10 +33,10 @@ Status: In Progress
 
 Status: In Progress
 
-- Add Prisma + MySQL with models for users, refresh sessions, learner types, categories, levels, courses, and leads.
+- Add Prisma + MySQL with models for users, Auth.js auth records, learner types, categories, levels, courses, and leads.
 - Add separate course pricing and coupon models so GST-aware commercial data is not mixed into course content.
 - Keep the existing public frontend data as the source of truth for seeded categories, levels, and courses.
-- Add custom auth using email/password, bcrypt hashing, JWT access tokens, and httpOnly refresh cookies.
+- Add Auth.js JWT-session auth with CredentialsProvider, bcrypt manual signup/login, Google/GitHub/LinkedIn SSO, profile completion state, and `sessionVersion` revocation support.
 - Add role-based access for `SUPER_ADMIN`, `ADMIN`, `MANAGER`, and `LEARNER`.
 - Keep learners out of the admin dashboard.
 - Add protected `/admin` pages for overview, users, learners, courses, categories, leads, and settings.
@@ -45,6 +45,8 @@ Status: In Progress
 - Add reusable toast feedback for common form submit success and error states.
 - Connect public contact/course enquiry submissions to the backend `Lead` table with server-side validation.
 - Connect donation interest submissions to backend persistence while keeping payment gateway integration deferred.
+- Add a unified placeholder `Payment` ledger for donation and future course payments, including full, EMI, and flexible payment modes.
+- Connect course detail enrollment CTA to a course payment placeholder flow while keeping real gateway integration deferred.
 
 ## Phase 4 - Form Handling Hardening
 
@@ -53,22 +55,23 @@ Status: Planned
 - Add spam protection/rate limiting for public form submissions.
 - Add admin workflow for donation interest follow-up.
 - Add optional email notifications after the submission flow is stable.
+- Add real payment gateway handoff and webhook verification after the placeholder payment records are stable.
 
 ## Phase 5 - Auth and Admin Hardening
 
 Status: Planned
 
 - Add password reset and email verification.
-- Add refresh-token cleanup and session listing/revocation.
+- Add admin session-revocation UI and audit trails around `sessionVersion` changes.
 - Add admin create/edit forms for courses, categories, users, and leads.
 - Add audit logging for sensitive admin actions.
-- Keep social SSO and enterprise SSO as future extension points.
+- Add profile completion for SSO users after signup.
 
 ## Phase 6 - CMS, Payments, and Operations
 
 Status: Future
 
-- Add donation payment gateway only after compliance and receipt requirements are defined.
+- Add donation/course payment gateway only after compliance, receipt, and refund requirements are defined.
 - Add CMS/admin tooling only when non-developer content updates are needed.
 - Add logging, monitoring, CI/CD, and Docker deployment polish as production readiness increases.
 

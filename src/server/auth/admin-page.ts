@@ -14,7 +14,7 @@ export async function requireAdminPageAccess(permission?: Permission) {
   }
 
   if (permission && !hasPermission(user.role, permission)) {
-    redirect(user.role === "MANAGER" ? "/admin/leads" : "/admin");
+    redirect(user.role === "MANAGER" ? "/admin/leads" : "/admin/dashboard");
   }
 
   return user;
